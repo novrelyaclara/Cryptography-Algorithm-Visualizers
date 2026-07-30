@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptography Algorithm Visualizers</title>
+    <link class="icon" rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <h1 class="typewriter1-title">Cryptography Algorithm Visualizers</h1>
+        <p class="header-description">
+            An interactive educational platform to visually guide you on how popular cryptography algorithms actually work to strengthen understanding and provide education on the algorithms that make encryption and security possible.
+        </p>
+
+        <!-- Total Visits Counter Badge -->
+        <div class="visitor-counter">
+            <span class="counter-label">TOTAL VISITS SO FAR</span>
+            <span class="counter-number" id="visit-count">...</span>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <section class="section">
+            <h2 class="section-title">Asymmetric-Key Algorithms</h2>
+            <div class="grid-container">
+                <a href="RSA/rsa.html" class="card">
+                    <div class="card-label">Rivest-Shamir-Adleman</div>
+                    <img src="RSA/RSA.PNG" alt="RSA Visualization">
+                </a>
+                <a href="ECC/ecc.html" class="card">
+                    <div class="card-label">Elliptic Curve Cryptography</div>
+                    <img src="ECC/ECC.PNG" alt="ECC Visualization">
+                </a>
+                <a href="DiffieHelman/diffiehelman.html" class="card">
+                    <div class="card-label">Diffie-Hellman Key Exchange</div>
+                    <img src="DiffieHelman/DiffieHelman.PNG" alt="Diffie-Hellman Visualization">
+                </a>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Symmetric-Key Algorithms</h2>
+            <div class="grid-container">
+                <a href="AES/aes.html" class="card">
+                    <div class="card-label">Advanced Encryption Standard</div>
+                    <img src="AES/AES.PNG" alt="AES Visualization">
+                </a>
+                <a href="DES/des.html" class="card">
+                    <div class="card-label">Data Encryption Standard</div>
+                    <img src="DES/DES.PNG" alt="DES Visualization">
+                </a>
+                <a href="ChaCha20/chacha20.html" class="card">
+                    <div class="card-label">ChaCha20</div>
+                    <img src="ChaCha20/ChaCha20.PNG" alt="ChaCha20 Visualization">
+                </a>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Hash Functions</h2>
+            <div class="grid-container">
+                <a href="SHA256/sha256.html" class="card">
+                    <div class="card-label">Secure Hash Algorithm 256-Bit</div>
+                    <img src="SHA256/SHA256.PNG" alt="SHA-256 Visualization">
+                </a>
+                <a href="MD5/md5.html" class="card">
+                    <div class="card-label">Message-Digest Algorithm 5</div>
+                    <img src="MD5/MD5.PNG" alt="MD5 Visualization">
+                </a>
+                <a href="BLAKE3/blake3.html" class="card">
+                    <div class="card-label">BLAKE3</div>
+                    <img src="BLAKE3/BLAKE3.PNG" alt="BLAKE3 Visualization">
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Script to fetch and display actual visit count -->
+    <script>
+    const namespace = "novrelyaclara";
+    const key = "Cryptography-Algorithm-Visualizers";
+
+    // Hit the endpoint to increment and fetch the counter
+    fetch(`https://v3.counterapi.dev/v1/${namespace}/${key}/up`)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.count !== undefined) {
+                document.getElementById('visit-count').innerText = data.count.toLocaleString();
+            } else {
+                document.getElementById('visit-count').innerText = '1';
+            }
+        })
+        .catch(err => {
+            console.error('Error loading view count:', err);
+            document.getElementById('visit-count').innerText = '1';
+        });
+</script>
+</body>
+</html>
