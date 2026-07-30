@@ -86,19 +86,21 @@
     const key = "Cryptography-Algorithm-Visualizers";
 
     // Hit the endpoint to increment and fetch the counter
-    fetch(`https://v3.counterapi.dev/v1/${namespace}/${key}/up`)
-        .then(res => res.json())
-        .then(data => {
-            if (data && data.count !== undefined) {
-                document.getElementById('visit-count').innerText = data.count.toLocaleString();
-            } else {
-                document.getElementById('visit-count').innerText = '1';
-            }
-        })
-        .catch(err => {
-            console.error('Error loading view count:', err);
-            document.getElementById('visit-count').innerText = '1';
-        });
+    fetch(`https://api.counterapi.dev/v1/${namespace}/${key}/up`)
+    .then(res => res.json())
+    .then(data => {
+        // CounterAPI returns `value` or `data.up_count`
+        const currentCount = data.value ?? data.data?.up_count ?? data.count;
+
+        if (currentCount !== undefined) {
+            document.getElementById('visit-count').innerText = Number(currentCount).toLocaleString();
+        } else {
+            console.warn('Unexpected API response structure:', data);
+        }
+    })
+    .catch(err => {
+        console.error('Error loading view count:', err);
+    });
 </script>
 </body>
 </html>
