@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChaCha20 Visualizer</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <main class="flowchart-container">
+
+        <header class="header">
+            <h1 class="typewriter5-title">ChaCha20 Visualizer</h1>
+            <!-- ALGORITHM OVERVIEW & FLOWCHART -->
+<section class="algo-overview">
+    <p class="header-description">
+        ChaCha20 is a high-speed symmetric stream cipher that generates a key stream by operating on a <strong>64-byte State Matrix</strong> across 20 quarter-round transformations using ARX (Add-Rotate-XOR) operations.
+    </p>
+
+    <div class="algo-diagram">
+        <div class="algo-node">
+            <span class="algo-node-step">01</span>
+            <div class="algo-node-text">
+                <strong>State Setup</strong>
+                <p>Construct 16-word state using Constants, Key, Counter & Nonce.</p>
+            </div>
+        </div>
+
+        <div class="algo-arrow">→</div>
+
+        <div class="algo-node">
+            <span class="algo-node-step">02</span>
+            <div class="algo-node-text">
+                <strong>Quarter-Rounds</strong>
+                <p>Perform 10 double-rounds (column & diagonal quarter-rounds).</p>
+            </div>
+        </div>
+
+        <div class="algo-arrow">→</div>
+
+        <div class="algo-node">
+            <span class="algo-node-step">03</span>
+            <div class="algo-node-text">
+                <strong>Key Stream & XOR</strong>
+                <p>Add initial state to final state and XOR with plaintext.</p>
+            </div>
+        </div>
+    </div>
+</section>
+            <div class="header-buttons">
+                <a href="../index.html" class="btn-nav">Homepage</a>
+                <button id="reset-btn" class="btn-reset">Reset Visualizer</button>
+            </div>
+        </header>
+
+        <!-- STEP 1: Key & Nonce Input -->
+        <section id="node-step1" class="flow-card active">
+            <div class="card-badge">STEP 1</div>
+            <h2>STEP 1: Secret Key & Nonce Setup</h2>
+            <p class="hint">Enter a 32-character (256-bit) secret key and a 12-character (96-bit) nonce to initialize the ChaCha20 cipher state.</p>
+            <div class="math-note-box" style="background-color: #f8f9fa; border-left: 4px solid #144d98; padding: 10px 14px; margin-bottom: 12px; border-radius: 4px; font-size: 0.9rem;">
+            <strong><u>Why do we need a Secret Key & Nonce?</u></strong>
+                <p style="margin: 4px 0 0 0;">
+                    <strong>Symmetric Stream Cipher:</strong> ChaCha20 generates a pseudorandom stream of bytes from a key and nonce.<br>
+                    <strong>256-Bit Key & 96-Bit Nonce:</strong> The key protects secrecy, while the unique nonce ensures that encrypting the same message twice produces different ciphertexts.<br>
+                    <strong>State Assembly:</strong> Combined with four 32-bit constants and a block counter, these parameters fill a 16-word (64-byte) matrix.
+                </p>
+            </div>
+            <div class="input-group">
+                <div class="field" style="width: 100%;">
+                    <label for="p">Secret Key (32 chars / 256-bit):</label>
+                    <input type="text" id="p" placeholder="Enter secret key" maxlength="32">
+                </div>
+            </div>
+            <button id="btn-step1" class="btn-step">Initialize Key & Nonce</button>
+            <div id="out-step1" class="step-output"></div>
+        </section>
+
+        <div class="flow-connector" id="conn-1">↓</div>
+
+        <!-- STEP 2: Nonce Input & 4x4 State Matrix Setup -->
+        <section id="node-step2" class="flow-card locked">
+            <div class="card-badge">STEP 2</div>
+            <h2>STEP 2: Nonce Input & 4x4 State Matrix</h2>
+            <p class="hint">Input a 12-byte nonce string to complete mapping the 4x4 (16-word) ChaCha20 State Matrix.</p>
+
+            <div class="math-note-box" style="background-color: #f8f9fa; border-left: 4px solid #144d98; padding: 10px 14px; margin-bottom: 12px; border-radius: 4px; font-size: 0.9rem;">
+                <strong><u>How does the 4x4 ChaCha20 State Matrix work?</u></strong>
+                <p style="margin: 4px 0 0 0;">
+                    ChaCha20 operates on sixteen 32-bit words laid out in a 4×4 matrix:<br>
+                    <strong>Words 0–3:</strong> Fixed Constants ("expand 32-byte k") | <strong>Words 4–11:</strong> 256-bit Secret Key<br>
+                    <strong>Word 12:</strong> Block Counter | <strong>Words 13–15:</strong> 96-bit Nonce (Number Used Once).
+                </p>
+            </div>
+
+            <div class="field">
+                <label for="e">Nonce String (12 chars / 96-bit):</label>
+                <input type="text" id="e" placeholder="Enter nonce string" maxlength="12" disabled>
+            </div>
+            <button id="btn-step2" class="btn-step" disabled>Construct State Matrix & Init Schedule</button>
+            <div id="out-step2" class="step-output"></div>
+        </section>
+
+        <div class="flow-connector" id="conn-2">↓</div>
+
+        <!-- KEY CREATED CELEBRATION BANNER -->
+        <div id="key-success-banner" class="success-banner hidden">
+            You've generated your ChaCha20 secret state!
+            <div class="key-display">
+                <span><strong>Key Status:</strong> <code id="disp-pub">256-bit Key Loaded</code></span>
+                <span><strong>Rounds Configured:</strong> <code id="disp-priv">20 Quarter-Rounds (10 Double Rounds)</code></span>
+            </div>
+        </div>
+
+        <!-- STEP 3: Sentence Encryption & Visual Breakdown -->
+        <section id="node-step3" class="flow-card locked">
+            <div class="card-badge">STEP 3</div>
+            <h2>STEP 3: Execute ChaCha20 Encryption & Decryption</h2>
+            <div class="field">
+                <label for="msg">Message Plaintext:</label>
+                <input type="text" id="msg" placeholder="Enter message" disabled>
+            </div>
+            <button id="btn-step3" class="btn-step" disabled>Encrypt & Decrypt Block</button>
+
+            <div id="out-step3" class="step-output"></div>
+
+            <!-- Transformation Pipeline Container -->
+            <div id="visual-pipeline" class="pipeline-container" style="display:none; margin-top: 15px;">
+                <h3>Round-by-Round ChaCha20 Encryption Pipeline</h3>
+                <div id="pipeline-nodes" class="pipeline-grid"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="chacha20.js"></script>
+</body>
+</html>

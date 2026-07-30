@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diffie-Hellman Visualizer</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <main class="flowchart-container">
+
+        <header class="header">
+            <h1 class="typewriter4-title">Diffie-Hellman Visualizer</h1>
+<!-- ALGORITHM OVERVIEW & FLOWCHART -->
+<section class="algo-overview">
+    <p class="header-description">
+        Diffie-Hellman is a key-exchange protocol that allows two parties to securely establish a shared secret over an insecure channel using a <strong>Public Parameter pair</strong> and individual <strong>Private Secrets</strong>.
+    </p>
+
+    <div class="algo-diagram">
+        <div class="algo-node">
+            <span class="algo-node-step">01</span>
+            <div class="algo-node-text">
+                <strong>Public Parameters</strong>
+                <p>Agree on shared prime <em>p</em> and base generator <em>g</em>.</p>
+            </div>
+        </div>
+
+        <div class="algo-arrow">→</div>
+
+        <div class="algo-node">
+            <span class="algo-node-step">02</span>
+            <div class="algo-node-text">
+                <strong>Key Exchange</strong>
+                <p>Pick secrets <em>a, b</em> and exchange public values <em>A, B</em>.</p>
+            </div>
+        </div>
+
+        <div class="algo-arrow">→</div>
+
+        <div class="algo-node">
+            <span class="algo-node-step">03</span>
+            <div class="algo-node-text">
+                <strong>Shared Key & Cipher</strong>
+                <p>Compute secret <em>S</em> to encrypt & decrypt messages.</p>
+            </div>
+        </div>
+    </div>
+</section>
+            <div class="header-buttons">
+                <a href="../index.html" class="btn-nav">Homepage</a>
+                <button id="reset-btn" class="btn-reset">Reset Visualizer</button>
+            </div>
+        </header>
+
+        <!-- STEP 1: Public Shared Parameters -->
+        <section id="node-step1" class="flow-card active">
+            <div class="card-badge">STEP 1</div>
+            <h2>STEP 1: Choose Public Parameters (p & g)</h2>
+            <p class="hint">Select a prime modulus (p) and a base generator (g). These parameters are shared publicly across the unsecure network.</p>
+            <div class="math-note-box" style="background-color: #f8f9fa; border-left: 4px solid #144d98; padding: 10px 14px; margin-bottom: 12px; border-radius: 4px; font-size: 0.9rem;">
+                <strong><u>Why do we need Prime <em>p</em> & Generator <em>g</em>?</u></strong>
+                <p style="margin: 4px 0 0 0;">
+                    <strong>Modulus (p):</strong> A shared prime number defining the mathematical field.<br>
+                    <strong>Generator (g):</strong> A base primitive root modulo <em>p</em> (where 1 &lt; g &lt; p).<br>
+                    Both <em>p</em> and <em>g</em> are known publicly to Alice, Bob, and any network listener.
+                </p>
+            </div>
+            <div class="input-group">
+                <div class="field">
+                    <label for="p">Prime Modulus p:</label>
+                    <input type="number" id="p" placeholder="Enter prime p">
+                </div>
+                <div class="field">
+                    <label for="q">Generator g:</label>
+                    <input type="number" id="q" placeholder="Enter generator g">
+                </div>
+            </div>
+            <button id="btn-step1" class="btn-step">Verify Public Parameters (p & g)</button>
+            <div id="out-step1" class="step-output"></div>
+        </section>
+
+        <div class="flow-connector" id="conn-1">↓</div>
+
+        <!-- STEP 2: Secrets & Public Keys -->
+        <section id="node-step2" class="flow-card locked">
+            <div class="card-badge">STEP 2</div>
+            <h2>STEP 2: Choose Private Secrets (a & b) & Calculate Public Keys</h2>
+            <p class="hint">Alice chooses secret <em>a</em> and Bob chooses secret <em>b</em>. Both calculate their public keys to exchange.</p>
+
+            <div class="math-note-box" style="background-color: #f8f9fa; border-left: 4px solid #144d98; padding: 10px 14px; margin-bottom: 12px; border-radius: 4px; font-size: 0.9rem;">
+                <strong><u>How are Public Keys calculated?</u></strong>
+                <p style="margin: 4px 0 0 0;">
+                    <strong>Alice's Public Key:</strong> <code>A = g<sup>a</sup> mod p</code><br>
+                    <strong>Bob's Public Key:</strong> <code>B = g<sup>b</sup> mod p</code><br>
+                    Secrets <em>a</em> and <em>b</em> are never sent across the network.
+                </p>
+            </div>
+
+            <div class="input-group">
+                <div class="field">
+                    <label for="e">Alice's Secret (a):</label>
+                    <input type="number" id="e" placeholder="Enter secret a" disabled>
+                </div>
+                <div class="field">
+                    <label for="msg">Bob's Secret (b):</label>
+                    <input type="number" id="msg" placeholder="Enter secret b" disabled>
+                </div>
+            </div>
+            <button id="btn-step2" class="btn-step" disabled>Calculate Public Keys (A & B)</button>
+            <div id="out-step2" class="step-output"></div>
+        </section>
+
+        <div class="flow-connector" id="conn-2">↓</div>
+
+        <!-- KEY CREATED CELEBRATION BANNER -->
+        <div id="key-success-banner" class="success-banner hidden">
+            Public Values Exchanged Over Network!
+            <div class="key-display">
+                <span><strong>Alice's Public (A):</strong> <code id="disp-pub"></code></span>
+                <span><strong>Bob's Public (B):</strong> <code id="disp-priv"></code></span>
+            </div>
+        </div>
+
+        <!-- STEP 3: Message Input & Encryption Pipeline -->
+        <section id="node-step3" class="flow-card locked">
+            <div class="card-badge">STEP 3</div>
+            <h2>STEP 3: Encrypt & Decrypt a Sentence using Shared Secret Key</h2>
+            <p class="hint">Compute the shared key S = B<sup>a</sup> mod p = A<sup>b</sup> mod p and use it to encrypt a plaintext message.</p>
+            <div class="field">
+                <label for="msg-text">Message Plaintext:</label>
+                <input type="text" id="msg-text" placeholder="Enter message" disabled>
+            </div>
+            <button id="btn-step3" class="btn-step" disabled>Compute Shared Key & Encrypt Sentence</button>
+
+            <div id="out-step3" class="step-output"></div>
+
+            <!-- Character Transformation Container -->
+            <div id="visual-pipeline" class="pipeline-container" style="display:none; margin-top: 15px;">
+                <h3>Char-by-Char Diffie-Helman Encryption Pipeline</h3>
+                <div id="pipeline-nodes" class="pipeline-grid"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="diffiehelman.js"></script>
+</body>
+</html>
