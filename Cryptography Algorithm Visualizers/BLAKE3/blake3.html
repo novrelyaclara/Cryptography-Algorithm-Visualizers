@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLAKE3 Visualizer</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <main class="flowchart-container">
+
+        <header class="header">
+            <h1 class="typewriter3-title">BLAKE3 Visualizer</h1><!-- ALGORITHM OVERVIEW & FLOWCHART -->
+            <section class="algo-overview">
+                <p class="header-description">
+                    BLAKE3 is an extremely fast cryptographic hash function based on Bao and BLAKE2. It uses a tree-hashing structure, bitwise XOR/rotations, and a <strong>256-bit (32-byte) default output digest</strong> with high parallelism.
+                </p>
+
+                <div class="algo-diagram">
+                    <div class="algo-node">
+                        <span class="algo-node-step">01</span>
+                        <div class="algo-node-text">
+                            <strong>Chunking & Setup</strong>
+                            <p>Split message into 1024-byte chunks & 64-byte blocks.</p>
+                        </div>
+                    </div>
+
+                    <div class="algo-arrow">→</div>
+
+                    <div class="algo-node">
+                        <span class="algo-node-step">02</span>
+                        <div class="algo-node-text">
+                            <strong>Message Permutation</strong>
+                            <p>Permute 16-word message blocks across rounds (<em>S₀–S₆</em>).</p>
+                        </div>
+                    </div>
+
+                    <div class="algo-arrow">→</div>
+
+                    <div class="algo-node">
+                        <span class="algo-node-step">03</span>
+                        <div class="algo-node-text">
+                            <strong>G Function Loop</strong>
+                            <p>Run 7 rounds across 16 state registers to output digest.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="header-buttons">
+                <a href="../index.html" class="btn-nav">Homepage</a>
+                <button id="reset-btn" class="btn-reset">Reset Visualizer</button>
+            </div>
+        </header>
+
+        <!-- STEP 1: Message Input & Pre-processing (Padding/Chunking) -->
+        <section id="node-step1" class="flow-card active">
+            <div class="card-badge">STEP 1</div>
+            <div class="card-badge">STEP 1</div>
+            <h2>STEP 1: Input Message Plaintext & Pad Bits</h2>
+            <p class="hint">BLAKE3 processes messages in 1024-byte chunks divided into 64-byte blocks. Unaligned blocks are zero-padded up to 64 bytes without appending length fields.</p>
+            <div class="math-note-box" style="background-color: #f8f9fa; border-left: 4px solid #144d98; padding: 10px 14px; margin-bottom: 12px; border-radius: 4px; font-size: 0.9rem;">
+                <strong><u>Why do we pad the message plaintext?</u></strong>
+                <p style="margin: 4px 0 0 0;">
+                    <strong>512-bit (64-byte) Block Alignment:</strong> BLAKE3 compression function operates on 16 32-bit words.<br>
+                    <strong>Padding Structure:</strong> Zero-pads trailing blocks up to 64 bytes. Domain separation flags (CHUNK_START, CHUNK_END, ROOT) handle length distinction rather than padded length bits.<br>
+                    This enables parallel tree hashing and extreme performance.
+                </p>
+            </div>
+            <div class="input-group">
+                <div class="field">
+                    <label for="msg-input">Message Plaintext:</label>
+                    <input type="text" id="msg-input" placeholder="Enter message">
+                </div>
+            </div>
+            <button id="btn-step1" class="btn-step">Pre-process & Pad Plaintext</button>
+            <div id="out-step1" class="step-output"></div>
+        </section>
+
+        <div class="flow-connector" id="conn-1">↓</div>
+
+        <!-- STEP 2: Message Schedule Construction (W0..W15 Permutations) -->
+        <section id="node-step2" class="flow-card locked">
+            <div class="card-badge">STEP 2</div>
+            <h2>STEP 2: Prepare Message Schedule (W0 to W63)</h2>
+            <p class="hint">Extract 16 words (32 bits each) from the message block and apply BLAKE3's fixed index permutation matrix across rounds.</p>
+
+            <div class="math-note-box" style="background-color: #f8f9fa; border-left: 4px solid #144d98; padding: 10px 14px; margin-bottom: 12px; border-radius: 4px; font-size: 0.9rem;">
+                <strong><u>How are words expanded from plaintext?</u></strong>
+                <p style="margin: 4px 0 0 0;">
+                    The first 16 words <code>m[0..15]</code> are drawn directly from the 64-byte message block.<br>
+                    Subsequent round schedules index <code>m[...]</code> via array permutation: <code>MSG_SCHEDULE[round][i]</code>.<br>
+                    Permutation pattern: <code>2, 6, 3, 10, 7, 0, 4, 13, 1, 11, 12, 5, 9, 14, 15, 8</code>.
+                </p>
+            </div>
+
+            <div class="field">
+                <label for="word-index">Inspect Specific Word Index (0–63):</label>
+                <input type="number" id="word-index" placeholder="Enter word index from schedule" disabled>
+            </div>
+            <button id="btn-step2" class="btn-step" disabled>Generate Message Schedule</button>
+            <div id="out-step2" class="step-output"></div>
+        </section>
+
+        <div class="flow-connector" id="conn-2">↓</div>
+
+        <!-- BLAKE3 INITIAL CONSTANTS BANNER -->
+        <div id="key-success-banner" class="success-banner hidden">
+            Initial State Hash Values (H0..H7 derived from IV constants):
+            <div class="key-display">
+                <span><strong>H0 - H3:</strong> <code id="disp-pub"></code></span>
+                <span><strong>H4 - H7:</strong> <code id="disp-priv"></code></span>
+            </div>
+        </div>
+
+        <!-- STEP 3: Compression Loop & Hash Output -->
+        <section id="node-step3" class="flow-card locked">
+            <div class="card-badge">STEP 3</div>
+            <h2>STEP 3: Execute Compression Loop & Produce Ciphertext Hash</h2>
+            <div class="field">
+                <label for="round-select">Simulate Compression Rounds (1-64):</label>
+                <input type="text" id="round-select" placeholder="Enter number of rounds to execute" disabled>
+            </div>
+            <button id="btn-step3" class="btn-step" disabled>Run Compression & Compute Ciphertext Hash</button>
+
+            <div id="out-step3" class="step-output"></div>
+
+            <!-- Visual Pipeline for Hash Registers -->
+            <div id="visual-pipeline" class="pipeline-container" style="display:none; margin-top: 15px;">
+                <h3>Register-by-Register BLAKE3 Encryption Pipeline</h3>
+                <div id="pipeline-nodes" class="pipeline-grid"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="blake3.js"></script>
+</body>
+</html>
